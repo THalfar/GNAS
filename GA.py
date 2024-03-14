@@ -30,8 +30,26 @@ class GA():
 
         self.generation = 0
         self.optimization_class = optimization_class
-        self.best_fitness = 0
+        self.best_fitness = -99999999999
         self.best_chromosome = None
+
+    def binary_to_integer(self, chromosome, start_index, end_index):
+        """
+        Convert a binary sequence within a chromosome from a specified start index to an end index into an integer.
+
+        Parameters:
+        chromosome (list or array): The chromosome represented as a sequence of binary digits (0s and 1s).
+        start_index (int): The starting index of the slice of the chromosome to be converted.
+        end_index (int): The ending index (exclusive) of the slice of the chromosome to be converted.
+
+        Returns:
+        int: The integer value of the specified binary sequence within the chromosome.
+        """
+        integer_value = 0
+        for i in range(start_index, end_index):
+            integer_value += chromosome[i] * 2 ** (i - start_index)
+
+        return integer_value
         
     def initilize_population(self):
 
@@ -43,17 +61,24 @@ class GA():
                             
         # Create the dataframe for the population and initiliaze the fitness column                            
         self.df_population = pd.DataFrame(population, index=chromosome_names)
-        self.df_population.insert(0, 'fitness', 0.0)
+        self.df_population.insert(0, 'mutrate', 0.0)
+        self.df_population.insert(0, 'fitness', 0.0)        
 
+        for idx in range(self.df_population.shape[0]):
+            chromosome = self.df_population.iloc[idx, 1:]
+            mutation_rate = (self.binary_to_integer(chromosome, 0, 3) + 1) / 100
+            self.df_population.iloc[idx, 1] = mutation_rate
+            
+    
         # Create the dataframe for the population history
         self.df_population_history = None
-        
+        self.df_best_history = None
 
     def calculate_fitness(self):
 
         # Calculate the fitness for each chromosome in the population
         for idx in range(self.df_population.shape[0]):
-            chromosome = self.df_population.iloc[idx, 1:]
+            chromosome = self.df_population.iloc[idx, 5:]
             fitness = self.optimization_class.get_fitness
             self.df_population.iloc[idx, 0] = fitness(chromosome)
 
@@ -63,6 +88,11 @@ class GA():
             self.best_chromosome = np.array(self.best_chromosome,dtype=int)
             self.best_chromosome_name = self.df_population.index[0]
             print(f"Found new best fitness:{self.best_fitness} name:{self.best_chromosome_name} chromosome:{self.best_chromosome}")
+
+            if self.df_best_history is None:
+                self.df_best_history = pd.DataFrame(columns=['best_fitness'])                
+            self.df_best_history.loc[self.generation] = [self.best_fitness]
+                    
 
         if self.df_population_history is None:
             self.df_population_history = self.df_population
@@ -119,6 +149,7 @@ class GA():
                         child_num += 1
 
         next_population = pd.DataFrame(next_population, index=next_population_names)
+        next_population.insert(0, 'mutrate', 0.0)
         next_population.insert(0, 'fitness', 0.0)
         self.df_population = next_population
 
@@ -126,11 +157,18 @@ class GA():
     def mutate_population(self):
         # Mutate the population based on the mutation rate
         for idx in range(self.df_population.shape[0]):
-            chromosome = self.df_population.iloc[idx, 1:]
-            for gene_idx in range(len(chromosome)):
-                if random.random() < self.mutation_rate:
+            chromosome = self.df_population.iloc[idx, 2:]
+            mutation_rate = (self.binary_to_integer(chromosome, 0, 3) + 1) / 100
+            # print(f"Mutation rate: {mutation_rate}")
+            self.df_population.iloc[idx, 1] = mutation_rate            
+            for gene_idx in range(len(chromosome)):                
+                if random.random() < mutation_rate:
                     chromosome[gene_idx] = 1 - chromosome[gene_idx]
-            self.df_population.iloc[idx, 1:] = chromosome
+            self.df_population.iloc[idx, 2:] = chromosome
+        self.df_population.head(100)
+
+
+    
 
     def run(self):
 
@@ -143,6 +181,9 @@ class GA():
         
     def give_population_history(self):
         return self.df_population_history
+
+    def give_best_history(self):    
+        return self.df_best_history
     
     def get_best_chromosome(self):
         return self.best_chromosome

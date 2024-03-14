@@ -1,40 +1,48 @@
 import pandas as pd
-from GA_sum_fitness import GA_sum_fitness  
+from GA_sum_fitness import GA_sum_fitness, GA_Ackley_fitness
 from GA import GA 
 import matplotlib.pyplot as plt
 
 config = {'starting_population_size' : 100,
-            'chromosome_length' : 200,
+            'chromosome_length' : 46,
             'num_parents' : 25,
             'children_number' : [10,5,2],
-            'max_generations' : 50,
-            'optimization_class' : GA_sum_fitness
+            'max_generations' : 50            
           }
 
-testi = GA(config, GA_sum_fitness)
+testi = GA(config, GA_Ackley_fitness)
 testi.run()
 pd.set_option('display.max_rows', 10000)
 history = testi.give_population_history()
-history.info()
+best_history = testi.give_best_history()
+print(history.head(10000))
 
-# Parse the history dataframe
 parsed_history = history.copy()
 parsed_history['generation'] = parsed_history.index.str.split('_').str[0].str[3:].astype(int)
 parsed_history['chromosome_idx'] = parsed_history.index.str.split('_').str[1].astype(int)
 
-# Aggregate different generations together
 aggregated_history = parsed_history.groupby('generation').agg({'fitness': 'mean'})
+mutation_mean = parsed_history.groupby('generation').agg({'mutrate': 'mean'})
 
-# Calculate the fitness mean of all chromosomes in each generation
 fitness_mean = aggregated_history['fitness']
+mutation_mean = mutation_mean['mutrate']
 
-# Print the fitness mean of each generation
-print(fitness_mean)
+fig, ax1 = plt.subplots()
 
+color = 'tab:blue'
+ax1.set_xlabel('Generation')
+ax1.set_ylabel('Mean Fitness', color=color)
+ax1.plot(fitness_mean, color=color, label='Mean Fitness')
+ax1.scatter(best_history.index, best_history['best_fitness'], color='green', s=20, label='Best Fitness', zorder=5)
+ax1.tick_params(axis='y', labelcolor=color)
 
+ax2 = ax1.twinx()  
+color = 'tab:red'
+ax2.set_ylabel('Mean Mutation Rate', color=color)
+ax2.plot(mutation_mean, color=color, label='Mean Mutation Rate')
+ax2.tick_params(axis='y', labelcolor=color)
 
-plt.plot(fitness_mean)
-plt.xlabel('Generation')
-plt.ylabel('Mean Fitness')
-plt.title('Mean Fitness Through Generations')
+plt.title('Mean Fitness and Mutation Rate Through Generations')
+fig.tight_layout()
+
 plt.show()
