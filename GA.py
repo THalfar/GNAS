@@ -2,17 +2,32 @@ import numpy as np
 import pandas as pd
 import random 
 
+"""
+This is the main class for the genetic algorithm. It contains the main functions for the genetic algorithm.
+The genetic algorithm principle is simple where only the fittest individuals are selected to produce the next generation.
+The main functions are:
+- initilize_population: Create the initial population
+- calculate_fitness: Calculate the fitness for each chromosome in the population
+- select_parents: Select the parents for the next generation
+- crossover_population: Create the next generation by crossover
+- mutate_population: Mutate the population based on the mutation rate
+- give_population_history: Return the population history as a dataframe
+- get_best_chromosome: Return the best chromosome
+- get_best_fitness: Return the best fitness
+
+
+"""
 class GA():
 
     def __init__(self, config, optimization_class):
 
         # Initialize the genetic algorithm parameters
-        self.chromosome_length = config.get('chromosome_length', 10)
+        self.chromosome_length = config.get('chromosome_length', 50)
         self.starting_population_size = config.get('population_size', 50)
         self.crossover_parts = config.get('crossover_rate', 1)
         self.mutation_rate = config.get('mutation_rate', 0.03)        
         self.max_generations = config.get('max_generations', 10)
-        self.num_parents = config.get('parent_number', 10)
+        self.num_parents = config.get('parent_number', 25)
         self.num_children = config.get('children_number', 2)
 
         self.generation = 0
@@ -53,7 +68,6 @@ class GA():
     def select_parents(self):
         # Select the parents for the next generation
         self.df_population = self.df_population.sort_values(by='fitness', ascending=False)
-        
         
         if self.df_population['fitness'].max() > self.best_fitness:            
             self.best_fitness = self.df_population['fitness'].max()
@@ -104,20 +118,25 @@ class GA():
                 if random.random() < self.mutation_rate:
                     chromosome[gene_idx] = 1 - chromosome[gene_idx]
             self.df_population.iloc[idx, 1:] = chromosome
-    
 
+    def run(self):
 
+        self.initilize_population()
+        for i in range(self.max_generations):
+            self.calculate_fitness()
+            parents = self.select_parents()
+            self.crossover_population(parents)
+            self.mutate_population()
         
-from GA_sum_fitness import GA_sum_fitness     
-config = {}
-testi = GA(config, GA_sum_fitness)
-testi.initilize_population()
-
-for i in range(10):
-    testi.calculate_fitness()
-    parents = testi.select_parents()
-    testi.crossover_population(parents)
-    testi.mutate_population()
+    def give_population_history(self):
+        return self.df_population_history
+    
+    def get_best_chromosome(self):
+        return self.best_chromosome
+    
+    def get_best_fitness(self):
+        return self.best_fitness
+    
 
 
 
