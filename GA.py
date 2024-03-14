@@ -8,20 +8,22 @@ class GA():
 
         # Initialize the genetic algorithm parameters
         self.chromosome_length = config.get('chromosome_length', 10)
-        self.population_size = config.get('population_size', 10)
+        self.starting_population_size = config.get('population_size', 50)
         self.crossover_parts = config.get('crossover_rate', 1)
         self.mutation_rate = config.get('mutation_rate', 0.03)        
         self.max_generations = config.get('max_generations', 10)
-        self.num_parents = config.get('parent_number', 5)
+        self.num_parents = config.get('parent_number', 10)
         self.num_children = config.get('children_number', 2)
 
         self.generation = 0
         self.optimization_class = optimization_class
+        self.best_fitness = 0
+        self.best_chromosome = None
         
     def initilize_population(self):
 
         # Create the initial population
-        population = np.random.randint(2, size=(self.population_size, self.chromosome_length))
+        population = np.random.randint(2, size=(self.starting_population_size, self.chromosome_length))
         
         # Create the chromosome names for first generation
         chromosome_names = [f"gen{self.generation}_{idx}" for idx in range(population.shape[0])]
@@ -33,7 +35,7 @@ class GA():
         # Create the dataframe for the population history
         self.df_population_history = None
         
-        
+
     def calculate_fitness(self):
 
         # Calculate the fitness for each chromosome in the population
@@ -47,18 +49,19 @@ class GA():
         else: 
             self.df_population_history = pd.concat([self.df_population_history, self.df_population], axis=0)
 
-        # print(f"Population history fitness: \n{self.df_population_history}")
         
-        # print(self.df_population)
-
-    
     def select_parents(self):
         # Select the parents for the next generation
         self.df_population = self.df_population.sort_values(by='fitness', ascending=False)
         
         
-        # print(self.df_population)
-        # print(self.df_population.iloc[:self.num_parents, :])
+        if self.df_population['fitness'].max() > self.best_fitness:            
+            self.best_fitness = self.df_population['fitness'].max()
+            self.best_chromosome = self.df_population.iloc[0, 1:].values
+            self.best_chromosome = np.array(self.best_chromosome,dtype=int)
+            self.best_chromosome_name = self.df_population.index[0]
+            print(f"Found new best fitness:{self.best_fitness} name:{self.best_chromosome_name} chromosome:{self.best_chromosome}")
+        
         return self.df_population.iloc[:self.num_parents, :]
 
 
