@@ -14,21 +14,19 @@ The main functions are:
 - give_population_history: Return the population history as a dataframe
 - get_best_chromosome: Return the best chromosome
 - get_best_fitness: Return the best fitness
-
-
 """
 class GA():
 
     def __init__(self, config, optimization_class):
 
         # Initialize the genetic algorithm parameters
-        self.chromosome_length = config.get('chromosome_length', 50)
-        self.starting_population_size = config.get('population_size', 50)
-        self.crossover_parts = config.get('crossover_rate', 1)
+        self.chromosome_length = config.get('chromosome_length', 20)
+        self.starting_population_size = config.get('starting_population_size', 50)
+        self.crossover_parts = config.get('crossover_parts', 1)
         self.mutation_rate = config.get('mutation_rate', 0.03)        
         self.max_generations = config.get('max_generations', 10)
-        self.num_parents = config.get('parent_number', 25)
-        self.num_children = config.get('children_number', 2)
+        self.num_parents = config.get('num_parents', 10)
+        self.num_children = config.get('num_childrens', [5,3,2])
 
         self.generation = 0
         self.optimization_class = optimization_class
@@ -59,6 +57,13 @@ class GA():
             fitness = self.optimization_class.get_fitness
             self.df_population.iloc[idx, 0] = fitness(chromosome)
 
+        if self.df_population['fitness'].max() > self.best_fitness:            
+            self.best_fitness = self.df_population['fitness'].max()
+            self.best_chromosome = self.df_population.iloc[0, 1:].values
+            self.best_chromosome = np.array(self.best_chromosome,dtype=int)
+            self.best_chromosome_name = self.df_population.index[0]
+            print(f"Found new best fitness:{self.best_fitness} name:{self.best_chromosome_name} chromosome:{self.best_chromosome}")
+
         if self.df_population_history is None:
             self.df_population_history = self.df_population
         else: 
@@ -68,14 +73,6 @@ class GA():
     def select_parents(self):
         # Select the parents for the next generation
         self.df_population = self.df_population.sort_values(by='fitness', ascending=False)
-        
-        if self.df_population['fitness'].max() > self.best_fitness:            
-            self.best_fitness = self.df_population['fitness'].max()
-            self.best_chromosome = self.df_population.iloc[0, 1:].values
-            self.best_chromosome = np.array(self.best_chromosome,dtype=int)
-            self.best_chromosome_name = self.df_population.index[0]
-            print(f"Found new best fitness:{self.best_fitness} name:{self.best_chromosome_name} chromosome:{self.best_chromosome}")
-        
         return self.df_population.iloc[:self.num_parents, :]
 
 
@@ -91,19 +88,35 @@ class GA():
             parent1 = parents.iloc[i, 1:].values
             available_parents = parents.drop(parents.index[i])
 
-            for j in range(self.num_children):
+            for childrens, idx in enumerate(self.num_children):
 
-                parent2_idx = random.choice(available_parents.index.tolist())
-                parent2 = available_parents.loc[parent2_idx, 0:].values    
-                
-                crossover_point = random.randint(1, self.chromosome_length-1)  
-            
-                child = np.zeros(self.chromosome_length, dtype=int)
-                child[:crossover_point] = parent1[:crossover_point]
-                child[crossover_point:] = parent2[crossover_point:]   
-                next_population.append(child)
-                next_population_names.append(f"gen{self.generation}_{child_num}")
-                child_num += 1
+                if idx > len(self.num_children):
+                    for _ in range(self.num_children[-1]):
+                    
+                        parent2_idx = random.choice(available_parents.index.tolist())
+                        parent2 = available_parents.loc[parent2_idx, 0:].values    
+                        crossover_point = random.randint(1, self.chromosome_length-1)  
+                    
+                        child = np.zeros(self.chromosome_length, dtype=int)
+                        child[:crossover_point] = parent1[:crossover_point]
+                        child[crossover_point:] = parent2[crossover_point:]   
+                        next_population.append(child)
+                        next_population_names.append(f"gen{self.generation}_{child_num}")
+                        child_num += 1
+
+                else: 
+                    for _ in range(childrens):
+                    
+                        parent2_idx = random.choice(available_parents.index.tolist())
+                        parent2 = available_parents.loc[parent2_idx, 0:].values    
+                        crossover_point = random.randint(1, self.chromosome_length-1)  
+                    
+                        child = np.zeros(self.chromosome_length, dtype=int)
+                        child[:crossover_point] = parent1[:crossover_point]
+                        child[crossover_point:] = parent2[crossover_point:]   
+                        next_population.append(child)
+                        next_population_names.append(f"gen{self.generation}_{child_num}")
+                        child_num += 1
 
         next_population = pd.DataFrame(next_population, index=next_population_names)
         next_population.insert(0, 'fitness', 0.0)
@@ -136,11 +149,3 @@ class GA():
     
     def get_best_fitness(self):
         return self.best_fitness
-    
-
-
-
-        
-
-    
-    
