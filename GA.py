@@ -27,11 +27,15 @@ class GA():
         self.max_generations = config.get('max_generations', 10)
         self.num_parents = config.get('num_parents', 10)
         self.num_children = config.get('num_childrens', [5,3,2])
+        self.max_fitness = config.get('max_fitness', None)
+        self.min_mutation_rate = config.get('min_mutation_rate', 0.01)
 
         self.generation = 0
         self.optimization_class = optimization_class
         self.best_fitness = -99999999999
         self.best_chromosome = None
+        if self.max_fitness is not None:
+            self.max_fitness = float(self.max_fitness)
 
     def binary_to_integer(self, chromosome, start_index, end_index):
         """
@@ -66,7 +70,7 @@ class GA():
 
         for idx in range(self.df_population.shape[0]):
             chromosome = self.df_population.iloc[idx, 2:]        
-            mutation_rate = (self.binary_to_integer(chromosome, 0, 4) + 1) / 100
+            mutation_rate = (self.binary_to_integer(chromosome, 0, 4)) / 100 + self.min_mutation_rate
             # print(f"Mutation rate: {mutation_rate}")
             # print(f"Chromosome:\n{chromosome[:4]}")            
             # print(f"{self.df_population.iloc[idx, 1]}")    
@@ -82,10 +86,10 @@ class GA():
         # Calculate the fitness for each chromosome in the population
         for idx in range(self.df_population.shape[0]):
             chromosome = self.df_population.iloc[idx, 6:]
-            fitness = self.optimization_class.get_fitness
-            self.df_population.iloc[idx, 0] = fitness(chromosome)
+            # fitness = self.optimization_class.get_fitness
+            self.df_population.iloc[idx, 0] = self.optimization_class.get_fitness(chromosome)
             chromosome = self.df_population.iloc[idx, 2:]
-            mutation_rate = (self.binary_to_integer(chromosome, 0, 4) + 1) / 100
+            mutation_rate = (self.binary_to_integer(chromosome, 0, 4)) / 100 + self.min_mutation_rate
             # print(f"Mutation rate: {mutation_rate}")
             # print(f"Chromosome:\n{chromosome[:4]}")
             self.df_population.iloc[idx, 1] = mutation_rate   
@@ -100,6 +104,11 @@ class GA():
             if self.df_best_history is None:
                 self.df_best_history = pd.DataFrame(columns=['best_fitness'])                
             self.df_best_history.loc[self.generation] = [self.best_fitness]
+            
+            # Break GA if given max fitness is reached
+            if self.max_fitness is not None and self.best_fitness >= self.max_fitness:
+                print(f"Max fitness reached in generation:{self.generation} with fitness:{self.best_fitness}")
+                self.generation = self.max_generations + 1
                     
 
         if self.df_population_history is None:
@@ -182,11 +191,12 @@ class GA():
     def run(self):
 
         self.initilize_population()
-        for i in range(self.max_generations):
+        while self.generation < self.max_generations:
             self.calculate_fitness()
             parents = self.select_parents()
             self.crossover_population(parents)
             self.mutate_population()
+            self.generation += 1
         
     def give_population_history(self):
         return self.df_population_history

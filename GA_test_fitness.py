@@ -26,6 +26,7 @@ def binary_to_logarithmic_float(chromosome, start_high, end_high, end_low):
 
     return output
 
+
 class GA_sum_fitness():
     @staticmethod
     def get_fitness(chromosome):
@@ -34,18 +35,39 @@ class GA_sum_fitness():
 class GA_Ackley_fitness():
     @staticmethod
     def get_fitness(chromosome):
-        # Oletetaan, että chromosome sisältää vain kaksi geeniä ja ne on skaalattu välille [-5, 5]
-        # print("kromosome")
-        # print(chromosome)
-        # print(len(chromosome))
+
         x = binary_to_logarithmic_float(chromosome, 4, 14, 24)
         y = binary_to_logarithmic_float(chromosome, 24, 34, 44)
         
-        # Laske Ackley-funktio
         part1 = -20 * np.exp(-0.2 * np.sqrt(0.5 * (x**2 + y**2)))
         part2 = -np.exp(0.5 * (np.cos(2 * np.pi * x) + np.cos(2 * np.pi * y)))
         ackley_value = part1 + part2 + np.e + 20
-        
-        # Koska GA yleensä maksimoi fitness-arvon, käytetään negatiivista Ackley-arvoa
-        # Jotta pienempi Ackley-arvo (eli lähempänä globaalia minimiä) tarkoittaisi parempaa fitness-arvoa
+                
         return -ackley_value
+
+class GA_Rastrigin_fitness():
+    @staticmethod
+    def get_fitness(chromosome):
+        """
+        Calculate the extended Rastrigin function value for a given chromosome
+        that includes variables x, y, z, and u.
+
+        Parameters:
+        chromosome (list or array): A numpy array representing a chromosome, where each element is a gene.
+
+        Returns:
+        float: The Rastrigin function value for the given chromosome.
+        """
+        x = binary_to_logarithmic_float(chromosome, 4, 14, 24)
+        y = binary_to_logarithmic_float(chromosome, 24, 34, 44)
+        z = binary_to_logarithmic_float(chromosome, 44, 54, 64)
+        u = binary_to_logarithmic_float(chromosome, 64, 74, 84)  # Lisätään u:n laskenta
+        
+        # Laske Rastrigin-funktio neljälle muuttujalle
+        A = 10
+        n = 4  # Käsittelemme neljää muuttujaa
+        sum_terms = (x**2 - A * np.cos(2 * np.pi * x)) + (y**2 - A * np.cos(2 * np.pi * y)) + (z**2 - A * np.cos(2 * np.pi * z)) + (u**2 - A * np.cos(2 * np.pi * u))
+        rastrigin_value = A * n + sum_terms
+        
+        # Käytetään negatiivista Rastrigin-arvoa fitness-arvona
+        return -rastrigin_value
