@@ -3,11 +3,11 @@ from GA_sum_fitness import GA_sum_fitness, GA_Ackley_fitness
 from GA import GA 
 import matplotlib.pyplot as plt
 
-config = {'starting_population_size' : 100,
-            'chromosome_length' : 46,
-            'num_parents' : 25,
-            'children_number' : [10,5,2],
-            'max_generations' : 50            
+config = {'starting_population_size' : 200,
+            'chromosome_length' : 44,
+            'num_parents' : 30,
+            'children_number' : [10,3,2],
+            'max_generations' : 50
           }
 
 testi = GA(config, GA_Ackley_fitness)

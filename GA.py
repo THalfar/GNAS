@@ -65,8 +65,11 @@ class GA():
         self.df_population.insert(0, 'fitness', 0.0)        
 
         for idx in range(self.df_population.shape[0]):
-            chromosome = self.df_population.iloc[idx, 1:]
-            mutation_rate = (self.binary_to_integer(chromosome, 0, 3) + 1) / 100
+            chromosome = self.df_population.iloc[idx, 2:]        
+            mutation_rate = (self.binary_to_integer(chromosome, 0, 4) + 1) / 100
+            # print(f"Mutation rate: {mutation_rate}")
+            # print(f"Chromosome:\n{chromosome[:4]}")            
+            # print(f"{self.df_population.iloc[idx, 1]}")    
             self.df_population.iloc[idx, 1] = mutation_rate
             
     
@@ -78,9 +81,14 @@ class GA():
 
         # Calculate the fitness for each chromosome in the population
         for idx in range(self.df_population.shape[0]):
-            chromosome = self.df_population.iloc[idx, 5:]
+            chromosome = self.df_population.iloc[idx, 6:]
             fitness = self.optimization_class.get_fitness
             self.df_population.iloc[idx, 0] = fitness(chromosome)
+            chromosome = self.df_population.iloc[idx, 2:]
+            mutation_rate = (self.binary_to_integer(chromosome, 0, 4) + 1) / 100
+            # print(f"Mutation rate: {mutation_rate}")
+            # print(f"Chromosome:\n{chromosome[:4]}")
+            self.df_population.iloc[idx, 1] = mutation_rate   
 
         if self.df_population['fitness'].max() > self.best_fitness:            
             self.best_fitness = self.df_population['fitness'].max()
@@ -158,8 +166,9 @@ class GA():
         # Mutate the population based on the mutation rate
         for idx in range(self.df_population.shape[0]):
             chromosome = self.df_population.iloc[idx, 2:]
-            mutation_rate = (self.binary_to_integer(chromosome, 0, 3) + 1) / 100
+            mutation_rate = (self.binary_to_integer(chromosome, 0, 4) + 1) / 100
             # print(f"Mutation rate: {mutation_rate}")
+            # print(f"Chromosome:\n{chromosome[:4]}")
             self.df_population.iloc[idx, 1] = mutation_rate            
             for gene_idx in range(len(chromosome)):                
                 if random.random() < mutation_rate:

@@ -38,8 +38,8 @@ class GA_Ackley_fitness():
         # print("kromosome")
         # print(chromosome)
         # print(len(chromosome))
-        x = binary_to_logarithmic_float(chromosome, 5, 15, 25)
-        y = binary_to_logarithmic_float(chromosome, 26, 36, 46)
+        x = binary_to_logarithmic_float(chromosome, 4, 14, 24)
+        y = binary_to_logarithmic_float(chromosome, 24, 34, 44)
         
         # Laske Ackley-funktio
         part1 = -20 * np.exp(-0.2 * np.sqrt(0.5 * (x**2 + y**2)))
