@@ -99,7 +99,8 @@ class GA():
             self.best_chromosome = self.df_population.iloc[0, 1:].values
             self.best_chromosome = np.array(self.best_chromosome,dtype=int)
             self.best_chromosome_name = self.df_population.index[0]
-            print(f"Found new best fitness:{self.best_fitness} name:{self.best_chromosome_name} chromosome:{self.best_chromosome}")
+            solution = self.optimization_class.get_solution(self.best_chromosome)
+            print(f"Found new best fitness:{self.best_fitness}, solution:{solution} name:{self.best_chromosome_name} chromosome:{self.best_chromosome}")
 
             if self.df_best_history is None:
                 self.df_best_history = pd.DataFrame(columns=['best_fitness'])                

@@ -44,6 +44,14 @@ class GA_Ackley_fitness():
         ackley_value = part1 + part2 + np.e + 20
                 
         return -ackley_value
+    
+    @staticmethod
+    def get_solution(chromosome):
+        x = binary_to_logarithmic_float(chromosome, 4, 14, 24)
+        y = binary_to_logarithmic_float(chromosome, 24, 34, 44)
+        return (x, y)
+        
+        
 
 class GA_Rastrigin_fitness():
     @staticmethod
@@ -71,3 +79,11 @@ class GA_Rastrigin_fitness():
         
         # Käytetään negatiivista Rastrigin-arvoa fitness-arvona
         return -rastrigin_value
+    
+    @staticmethod
+    def get_solution(chromosome):
+        x = binary_to_logarithmic_float(chromosome, 4, 14, 24)
+        y = binary_to_logarithmic_float(chromosome, 24, 34, 44)
+        z = binary_to_logarithmic_float(chromosome, 44, 54, 64)
+        u = binary_to_logarithmic_float(chromosome, 64, 74, 84)
+        return (x, y, z, u)

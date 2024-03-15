@@ -59,10 +59,10 @@ config_ackley = {'starting_population_size' : 200,
                 }
 
 # Configuration for Rastrigin function minimization. Keeping minimum mutation rate higher to avoid premature convergence.
-config_rastrigin = {'starting_population_size' : 500,
+config_rastrigin = {'starting_population_size' : 300,
                     'chromosome_length' : 84,
                     'num_parents' : 40,
-                    'children_number' : [10,5,3,2],
+                    'children_number' : [5,3,2],
                     'max_generations' : 100,
                     'max_fitness' : '0.0',
                     'min_mutation_rate' : 0.02
