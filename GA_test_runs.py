@@ -6,7 +6,7 @@ import time
 
 """
 This is a test script to run the genetic algorithm and plot the mean fitness and mutation rate over generations.
-The chromosome length is with purpose to be too for these optimization problems, reason -> to test the GA implementation with a large search space.
+The chromosome length is with purpose too long to study GA behavior.
 """
 
 def run_and_plot_ga(config, optimization_function):
@@ -50,17 +50,17 @@ def run_and_plot_ga(config, optimization_function):
 
 # Configuration for Ackley function minimization. Keeping minimum mutation rate higher to avoid premature convergence.
 config_ackley = {'starting_population_size' : 200,
-                'chromosome_length' : 44,
+                'chromosome_length' : 33,
                 'num_parents' : 30,
                 'children_number' : [5,3,2],
-                'max_generations' : 100,
+                'max_generations' : 50,
                 'max_fitness' : '0.0',
                 'min_mutation_rate' : 0.03
                 }
 
 # Configuration for Rastrigin function minimization. Keeping minimum mutation rate higher to avoid premature convergence.
 config_rastrigin = {'starting_population_size' : 300,
-                    'chromosome_length' : 84,
+                    'chromosome_length' : 61,
                     'num_parents' : 40,
                     'children_number' : [5,3,2],
                     'max_generations' : 100,

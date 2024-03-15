@@ -36,8 +36,8 @@ class GA_Ackley_fitness():
     @staticmethod
     def get_fitness(chromosome):
 
-        x = binary_to_logarithmic_float(chromosome, 4, 14, 24)
-        y = binary_to_logarithmic_float(chromosome, 24, 34, 44)
+        x = binary_to_logarithmic_float(chromosome, 4, 8, 18)
+        y = binary_to_logarithmic_float(chromosome, 18, 22, 32)
         
         part1 = -20 * np.exp(-0.2 * np.sqrt(0.5 * (x**2 + y**2)))
         part2 = -np.exp(0.5 * (np.cos(2 * np.pi * x) + np.cos(2 * np.pi * y)))
@@ -47,8 +47,8 @@ class GA_Ackley_fitness():
     
     @staticmethod
     def get_solution(chromosome):
-        x = binary_to_logarithmic_float(chromosome, 4, 14, 24)
-        y = binary_to_logarithmic_float(chromosome, 24, 34, 44)
+        x = binary_to_logarithmic_float(chromosome, 4, 8, 18)
+        y = binary_to_logarithmic_float(chromosome, 18, 22, 32)
         return (x, y)
         
         
@@ -66,10 +66,10 @@ class GA_Rastrigin_fitness():
         Returns:
         float: The Rastrigin function value for the given chromosome.
         """
-        x = binary_to_logarithmic_float(chromosome, 4, 14, 24)
-        y = binary_to_logarithmic_float(chromosome, 24, 34, 44)
-        z = binary_to_logarithmic_float(chromosome, 44, 54, 64)
-        u = binary_to_logarithmic_float(chromosome, 64, 74, 84)  # Lisätään u:n laskenta
+        x = binary_to_logarithmic_float(chromosome, 4, 8, 18)
+        y = binary_to_logarithmic_float(chromosome, 18, 22, 32)
+        z = binary_to_logarithmic_float(chromosome, 32, 36, 46)
+        u = binary_to_logarithmic_float(chromosome, 46, 50, 60)  # Lisätään u:n laskenta
         
         # Laske Rastrigin-funktio neljälle muuttujalle
         A = 10
@@ -82,8 +82,8 @@ class GA_Rastrigin_fitness():
     
     @staticmethod
     def get_solution(chromosome):
-        x = binary_to_logarithmic_float(chromosome, 4, 14, 24)
-        y = binary_to_logarithmic_float(chromosome, 24, 34, 44)
-        z = binary_to_logarithmic_float(chromosome, 44, 54, 64)
-        u = binary_to_logarithmic_float(chromosome, 64, 74, 84)
+        x = binary_to_logarithmic_float(chromosome, 4, 8, 18)
+        y = binary_to_logarithmic_float(chromosome, 18, 22, 32)
+        z = binary_to_logarithmic_float(chromosome, 32, 36, 46)
+        u = binary_to_logarithmic_float(chromosome, 46, 50, 60)
         return (x, y, z, u)
