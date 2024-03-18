@@ -32,10 +32,10 @@ class GA():
 
         self.generation = 0
         self.optimization_class = optimization_class
-        self.best_fitness = -99999999999
+        self.best_fitness = float('-inf')
         self.best_chromosome = None
         if self.max_fitness is not None:
-            self.max_fitness = float(self.max_fitness)
+            self.max_fitness = self.max_fitness
 
     def binary_to_integer(self, chromosome, start_index, end_index):
         """
@@ -108,7 +108,7 @@ class GA():
             
             # Break GA if given max fitness is reached
             if self.max_fitness is not None and self.best_fitness >= self.max_fitness:
-                print(f"Max fitness reached in generation:{self.generation} with fitness:{self.best_fitness}")
+                print(f"Max fitness reached in generation:{self.generation} with fitness:{self.best_fitness}, max_fitness:{self.max_fitness}")
                 self.generation = self.max_generations + 1
                     
 

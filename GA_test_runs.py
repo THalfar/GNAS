@@ -26,7 +26,7 @@ def run_and_plot_ga(config, optimization_function):
     fitness_mean = aggregated_history['fitness']
     mutation_mean = mutation_mean['mutrate']
 
-    time.sleep(0.1) # WSL2 problem with showing the plot
+    time.sleep(0.5) # WSL2 problem with showing the plot
     fig, ax1 = plt.subplots(figsize=(15, 6))
 
     color = 'tab:blue'
@@ -48,28 +48,34 @@ def run_and_plot_ga(config, optimization_function):
     # TODO: Some WSL2 problem with showing the plot
     plt.show()
 
-# Configuration for Ackley function minimization. Keeping minimum mutation rate higher to avoid premature convergence.
+
+ackley = GA_Ackley_fitness(start_gene=4, integer_bits=5, fraction_bits=15)
+len_ackley_gene = ackley.calculate_chromosome_length()
+
+# Configuration for Ackley function minimization. 
 config_ackley = {'starting_population_size' : 200,
-                'chromosome_length' : 33,
+                'chromosome_length' : len_ackley_gene,
                 'num_parents' : 30,
                 'children_number' : [5,3,2],
                 'max_generations' : 50,
-                'max_fitness' : '0.0',
-                'min_mutation_rate' : 0.03
+                'max_fitness' : 0.0,
+                'min_mutation_rate' : 0.01
                 }
 
-# Configuration for Rastrigin function minimization. Keeping minimum mutation rate higher to avoid premature convergence.
-config_rastrigin = {'starting_population_size' : 300,
-                    'chromosome_length' : 61,
-                    'num_parents' : 40,
+# run_and_plot_ga(config_ackley, ackley)
+
+rastrigin = GA_Rastrigin_fitness(start_gene=4, integer_bits=4, fraction_bits=15, dimensions=3)
+len_rastrigin_gene = rastrigin.calculate_chromosome_length()
+
+# Configuration for Rastrigin function minimization. 
+config_rastrigin = {'starting_population_size' : 1000,
+                    'chromosome_length' : len_rastrigin_gene,
+                    'num_parents' : 50,
                     'children_number' : [5,3,2],
-                    'max_generations' : 100,
-                    'max_fitness' : '0.0',
-                    'min_mutation_rate' : 0.02
+                    'max_generations' : 300,
+                    'max_fitness' : 0.0,
+                    'min_mutation_rate' : 0.01
                     }
 
-# Run and plot GA for Ackley function minimization
-run_and_plot_ga(config_ackley, GA_Ackley_fitness)
-
-# Run and plot GA for Rastrigin function minimization
-run_and_plot_ga(config_rastrigin, GA_Rastrigin_fitness)
+print(f"Rastrigin gene length: {len_rastrigin_gene}")
+run_and_plot_ga(config_rastrigin, rastrigin)
