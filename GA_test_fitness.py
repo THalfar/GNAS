@@ -40,16 +40,15 @@ class GA_sum_fitness():
 
 
 class GA_Ackley_fitness:
-    def __init__(self, mut_gene, integer_bits, fraction_bits):
-        self.mut_gene = mut_gene
+    def __init__(self, integer_bits, fraction_bits):        
         self.integer_bits = integer_bits
         self.fraction_bits = fraction_bits
         self.total_bits_per_variable = integer_bits + fraction_bits
         self.__name__ = 'Ackley'
 
     def get_fitness(self, chromosome):
-        x_start = self.mut_gene
-        y_start = self.mut_gene + self.total_bits_per_variable
+        x_start = 0
+        y_start = self.total_bits_per_variable
         
         x = binary_to_logarithmic_float(chromosome, x_start, x_start + self.integer_bits, x_start + self.total_bits_per_variable)
         y = binary_to_logarithmic_float(chromosome, y_start, y_start + self.integer_bits, y_start + self.total_bits_per_variable)
@@ -61,8 +60,8 @@ class GA_Ackley_fitness:
         return -ackley_value
 
     def get_solution(self, chromosome):
-        x_start = self.mut_gene
-        y_start = self.mut_gene + self.total_bits_per_variable
+        x_start = 0
+        y_start = self.total_bits_per_variable
         
         x = binary_to_logarithmic_float(chromosome, x_start, x_start + self.integer_bits, x_start + self.total_bits_per_variable)
         y = binary_to_logarithmic_float(chromosome, y_start, y_start + self.integer_bits, y_start + self.total_bits_per_variable)
@@ -70,12 +69,12 @@ class GA_Ackley_fitness:
         return (x, y)
 
     def calculate_chromosome_length(self):        
-        return self.mut_gene + 2 * self.total_bits_per_variable
+        return  self.total_bits_per_variable * 2
 
     
 class GA_Rastrigin_fitness:
-    def __init__(self, mut_gene, integer_bits, fraction_bits, dimensions):
-        self.mut_gene = mut_gene
+    def __init__(self, integer_bits, fraction_bits, dimensions):
+        
         self.integer_bits = integer_bits
         self.fraction_bits = fraction_bits
         self.total_bits_per_variable = integer_bits + fraction_bits
@@ -83,7 +82,7 @@ class GA_Rastrigin_fitness:
         self.__name__ = 'Rastrigin'
 
     def get_fitness(self, chromosome):
-        args = [binary_to_logarithmic_float(chromosome, self.mut_gene + i * self.total_bits_per_variable, self.mut_gene + self.integer_bits + i * self.total_bits_per_variable, self.mut_gene + self.total_bits_per_variable + i * self.total_bits_per_variable) for i in range(self.dimensions)]
+        args = [binary_to_logarithmic_float(chromosome,  i * self.total_bits_per_variable, self.integer_bits + i * self.total_bits_per_variable, self.total_bits_per_variable + i * self.total_bits_per_variable) for i in range(self.dimensions)]
         
         A = 10
         sum_terms = sum(x**2 - A * np.cos(2 * np.pi * x) for x in args)
@@ -92,9 +91,9 @@ class GA_Rastrigin_fitness:
         return -rastrigin_value
 
     def get_solution(self, chromosome):
-        return tuple([binary_to_logarithmic_float(chromosome, self.mut_gene + i * self.total_bits_per_variable, self.mut_gene + self.integer_bits + i * self.total_bits_per_variable, self.mut_gene + self.total_bits_per_variable + i * self.total_bits_per_variable) for i in range(self.dimensions)])
+        return tuple([binary_to_logarithmic_float(chromosome,  i * self.total_bits_per_variable, self.integer_bits + i * self.total_bits_per_variable, self.total_bits_per_variable + i * self.total_bits_per_variable) for i in range(self.dimensions)])
 
     def calculate_chromosome_length(self):
-        return self.mut_gene + self.dimensions * self.total_bits_per_variable
+        return self.dimensions * self.total_bits_per_variable
 
 
