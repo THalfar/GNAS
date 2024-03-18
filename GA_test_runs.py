@@ -49,34 +49,38 @@ def run_and_plot_ga(config, optimization_function):
     plt.show()
 
 
-ackley = GA_Ackley_fitness(mut_gene=3, integer_bits=5, fraction_bits=15)
+ackley = GA_Ackley_fitness(mut_gene=3, integer_bits=4, fraction_bits=8)
 len_ackley_gene = ackley.calculate_chromosome_length()
 
 # Configuration for Ackley function minimization. 
 config_ackley = {'starting_population_size' : 200,
                 'chromosome_length' : len_ackley_gene,
-                'num_parents' : 30,
-                'children_number' : [5,3,2],
+                'num_parents' : 50,
+                'children_number' : [10,5,2],
                 'max_generations' : 100,
                 'max_fitness' : 0.0,
-                'min_mutation_rate' : 0.01
+                'min_mutation_rate' : 0.02,
+                'mutation_rate_scale' : 0.05,
+                'len_mutation_rate_gen' : 3,
+                'invidual_mutation_rate' : 0.05  
                 }
 
 run_and_plot_ga(config_ackley, ackley)
 
-rastrigin = GA_Rastrigin_fitness(mut_gene=3, integer_bits=4, fraction_bits=15, dimensions=8)
+rastrigin = GA_Rastrigin_fitness(mut_gene=3, integer_bits=4, fraction_bits=8, dimensions=4)
 len_rastrigin_gene = rastrigin.calculate_chromosome_length()
 
 # Configuration for Rastrigin function minimization. 
 config_rastrigin = {'starting_population_size' : 1000,
                     'chromosome_length' : len_rastrigin_gene,
                     'num_parents' : 100,
-                    'num_childrens' : [30,20,10,3],
+                    'num_childrens' : [10,5,2],
                     'max_generations' : 500,
-                    'max_fitness' : 0.0,
-                    'max_fitness_tolerance' : 1e-8,
-                    'min_mutation_rate' : 0.01,
-                    'len_mutation_rate_gen' : 3                
+                    'max_fitness' : 0.0,                    
+                    'min_mutation_rate' : 0.02,
+                    'len_mutation_rate_gen' : 3,
+                    'invidual_mutation_rate' : 0.05,
+                    'mutation_rate_scale' : 0.05
                     }
 
 print(f"Rastrigin gene length: {len_rastrigin_gene}")

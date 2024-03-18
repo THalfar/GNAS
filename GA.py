@@ -31,6 +31,8 @@ class GA():
         self.max_fitness_tolerance = config.get('max_fitness_tolerance', 1e-6)
         self.min_mutation_rate = config.get('min_mutation_rate', 0.01)
         self.len_mutation_rate_gene = config.get('len_mutation_rate_gene', 3)
+        self.invidual_mutation_rate = config.get('invidual_mutation_rate', 0.01)
+        self.mutation_rate_scale = config.get('mutation_rate_scale', 0.005)
 
         self.generation = 0
         self.optimization_class = optimization_class
@@ -74,7 +76,7 @@ class GA():
 
         for idx in range(self.df_population.shape[0]):
             chromosome = self.df_population.iloc[idx, 2:self.len_mutation_rate_gene+2]        
-            mutation_rate = (self.binary_to_integer(chromosome, 0, self.len_mutation_rate_gene)) / 100 + self.min_mutation_rate
+            mutation_rate = self.min_mutation_rate + self.binary_to_integer(chromosome, 0, self.len_mutation_rate_gene) * self.mutation_rate_scale
             # print(f"Mutation rate: {mutation_rate}")
             # print(f"Chromosome:\n{chromosome[:4]}")            
             # print(f"{self.df_population.iloc[idx, 1]}")    
@@ -96,7 +98,7 @@ class GA():
             chromosome_mut = self.df_population.iloc[idx, 2:self.len_mutation_rate_gene+2]            
             # print(chromosome_mut.values)
             # print(chromosome_mut.values.shape)
-            mutation_rate = (self.binary_to_integer(chromosome_mut, 0, self.len_mutation_rate_gene)) / 100 + self.min_mutation_rate
+            mutation_rate = self.min_mutation_rate + self.binary_to_integer(chromosome_mut, 0, self.len_mutation_rate_gene) * self.mutation_rate_scale
             # print(f"Mutation rate: {mutation_rate}")
             # print(f"Chromosome:\n{chromosome[:4]}")
             self.df_population.iloc[idx, 1] = mutation_rate   
@@ -183,14 +185,14 @@ class GA():
     def mutate_population(self):
         # Mutate the population based on the mutation rate
         for idx in range(self.df_population.shape[0]):
-            chromosome = self.df_population.iloc[idx, 2:]
-            mutation_rate = self.min_mutation_rate + self.binary_to_integer(chromosome, 0, self.len_mutation_rate_gene) / 100
-            self.df_population.iloc[idx, 1] = mutation_rate            
-
-            for gene_idx in range(len(chromosome)):                
-                if random.random() < mutation_rate:
-                    chromosome[gene_idx] = 1 - chromosome[gene_idx]
-            self.df_population.iloc[idx, 2:] = chromosome
+            mutation_rate = self.df_population.iloc[idx, 1]
+            chromosome = self.df_population.iloc[idx, 2:]            
+                  
+            if random.random() < self.invidual_mutation_rate:   
+                for gene_idx in range(len(chromosome)):                
+                    if random.random() < mutation_rate:
+                        chromosome[gene_idx] = 1 - chromosome[gene_idx]
+                self.df_population.iloc[idx, 2:] = chromosome
         
 
     
@@ -198,18 +200,22 @@ class GA():
         # Print the statistics for the current generation        
         print(f"Population Statistics for generation:{self.generation}")
         print(f"Population   size: {self.df_population.shape[0]}")
-        print(f"Population    Max: {self.df_population['fitness'].max():.5f}")
-        print(f"Population    Min: {self.df_population['fitness'].min():.5f}")
-        print(f"Population Median: {self.df_population['fitness'].median():.5f}")
-        print(f"Population   Mean: {self.df_population['fitness'].mean():.5f}")   
-        print(f"Population    std: {self.df_population['fitness'].std():.5f}")        
+        print(f"Population    Max: {self.df_population['fitness'].max():.8f}")
+        print(f"Population    Min: {self.df_population['fitness'].min():.8f}")
+        print(f"Population Median: {self.df_population['fitness'].median():.8f}")
+        print(f"Population   Mean: {self.df_population['fitness'].mean():.8f}")   
+        print(f"Population    std: {self.df_population['fitness'].std():.8f}")     
+        print(f"Mutarate     mean: {self.df_population['mutrate'].mean():.3f}")
+        print(f"Mutarate   median: {self.df_population['mutrate'].median():.3f}")
+        print(f"Mutarate      max: {self.df_population['mutrate'].max():.3f}")   
+        print(f"Mutarate      min: {self.df_population['mutrate'].min():.3f}")   
         print("---------------------------------------------")
         
 
     def run(self):
 
         self.initilize_population()
-        while self.generation < self.max_generations and not self.best_solution_found:
+        while self.generation <= self.max_generations and not self.best_solution_found:
             self.calculate_fitness()
             self.print_generation_stats()
             parents = self.select_parents()
